@@ -1,3 +1,14 @@
+(function() {
+	if (Function.prototype.bind !== 'function'){
+		Function.prototype.bind = function(bind) {
+			var self = this;
+			return function () {
+				var args = Array.prototype.slice.call(arguments);
+				return self.apply(bind || null, args);
+			};
+		}
+	}
+})();
 
 (function(){
 
@@ -42,16 +53,17 @@
 		},
 		play = function(loop) {
 			if (currentTimeout != 0) stop();
-			this.next = function() {
+			var next = function() {
 				var slide = getState(this);
 				interval = this.getAttribute('data-interval') || 2000;
 				if (slide[0] >= slide[1] && !loop) {
 					return;
 				};
 				this.xtag.slideNext.call(this);
-				currentTimeout = setTimeout(this.next.bind(this),interval);
+				console.log("calling set timeout for the next slide");
+				return currentTimeout = setTimeout(next.bind(this),interval);
 			};
-			currentTimeout = setTimeout(this.next.bind(this), this.getAttribute('data-interval') || 2000);
+			return currentTimeout = setTimeout(next.bind(this), this.getAttribute('data-interval') || 2000);
 		},
 		stop = function() {
 			clearTimeout(currentTimeout);
@@ -67,11 +79,11 @@
  		onInsert: function() {
 			var autoplay = this.getAttribute('autoplay'), start = this.getAttribute('data-start');
 			init.call(this);
-			if (start!=undefined) {
+			if (start != undefined) {
 				startOnSlide(this, start);
 			}
-			if (autoplay!=undefined) {
-				play.call(this, this.getAttribute('loop')!=undefined);
+			if (autoplay != undefined) {
+				play.call(this, this.getAttribute('loop') != undefined);
 			}
  		},
 		events:{
@@ -87,7 +99,7 @@
 				return this.getAttribute('data-start');
 			},
 			'loop' : function() {
-				return this.getAttribute('loop')!=undefined;
+				return this.getAttribute('loop') != undefined;
 			},
 		},
 		setters: {
@@ -108,11 +120,21 @@
 		methods: {
 			slideNext: function(){
 				var shift = getState(this);
-					shift[0]++;
+				shift[0]++;
 				slide(this, shift[0] > shift[1] ? 0 : shift[0]);
 			},
+			slideTo: function(slideIndex){
+				stop.call(this);
+				if (slideIndex < 0) {
+					slideIndex = 0;
+				} else {
+					var size = getState(this)[1];
+					slideIndex = slideIndex > size ? size : slideIndex;
+				}
+				slide(this, slideIndex);
+			},
 			play: function(){
-				play.call(this, this.getAttribute('loop')!=undefined);	
+				play.call(this, this.getAttribute('loop') != undefined);	
 			},
 			stop: function(){
 				stop.call(this);

@@ -1,0 +1,16 @@
+{
+	"name" : "Slideshow",
+	"tagName": "x-slideshow",
+	"version": "0.0.1",
+	"description":"Want a simple way to display rotating photos? Slideshow is a  container that allows loopable, animated transitions between content panes. Defines autoplay, loop, interval and starting slide attributes.  Note: Not smooth on Android.",
+	"images":[],
+	"categories":["structural"],
+	"compatibility" : {
+		"firefox" : 5,
+		"chrome" : 4,
+		"ie" : 9,
+		"opera" : 12,
+		"android" : 2.3,
+		"ios" : 4
+	}
+}
