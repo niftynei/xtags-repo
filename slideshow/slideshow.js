@@ -31,6 +31,7 @@
 			slides.forEach(function(slide){ slide.removeAttribute('selected'); });
 			slides[index || 0].setAttribute('selected', true);
 			el.firstElementChild.style[transform] = 'translate'+ (el.getAttribute('data-orientation') || 'x') + '(' + (index || 0) * (-100 / slides.length) + '%)';
+			el.setAttribute('data-slide', index+1 || 0);
 		},
 		init = function(toSelected){
 			var slides = this.firstElementChild;
@@ -68,7 +69,6 @@
 					return;
 				};
 				this.xtag.slideNext.call(this);
-				console.log("calling set timeout for the next slide");
 				return currentTimeout = setTimeout(next.bind(this),interval);
 			};
 			return currentTimeout = setTimeout(next.bind(this), this.getAttribute('data-interval') || 2000);
@@ -76,19 +76,15 @@
 		stop = function() {
 			clearTimeout(currentTimeout);
 			currentTimeout = 0;
-		},
-		startOnSlide = function(el, start) {
-			var slides = xtag.toArray(el.firstElementChild.children);
-			slides.forEach(function(slide){ slide.removeAttribute('selected'); });
-			slides[start - 1].setAttribute('selected', true);
 		};
 
 	xtag.register('x-slideshow', {
  		onInsert: function() {
-			var autoplay = this.getAttribute('autoplay'), start = this.getAttribute('data-start');
+			var autoplay = this.getAttribute('data-autoplay'), 
+			start = this.getAttribute('data-slide') - 1;
 			init.call(this);
 			if (start != undefined) {
-				startOnSlide(this, start);
+				slide(this, start);
 			}
 			if (autoplay != undefined) {
 				play.call(this, this.getAttribute('data-loop') != undefined);
@@ -102,9 +98,6 @@
 		getters: {
 			'data-interval': function(){
 				return this.getAttribute('data-interval');
-			},
-			'data-start' : function(){
-				return this.getAttribute('data-start');
 			},
 			'data-loop' : function() {
 				return this.getAttribute('data-loop') != undefined;
@@ -120,10 +113,6 @@
 			},
 			'data-interval': function(value){
 				this.setAttribute('data-interval', value);
-			},
-			'data-start': function(value){
-				value = validSlide(this, value) + 1;
-				this.setAttribute('data-start', value);
 			},
 			'data-slide': function(value){
 				value = validSlide(this, value-1);
