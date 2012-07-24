@@ -55,7 +55,7 @@
 			<p></p>
 			</div>
 			
-		<x-slideshow id="slideshow_demo" data-interval="1000" autoplay="autoplay" loop data-start=4>
+		<x-slideshow id="slideshow_demo" data-interval="1000" autoplay="autoplay" data-loop data-start=4>
 				<x-slides>
 					<x-slide><img src="../images/butterfly.jpeg" /></x-slide>
 					<x-slide><img src="../images/flower1.jpeg" /></x-slide>
@@ -97,7 +97,7 @@
 
 				case 'slideTo':
 					var slideIndex = document.getElementById('slide').value;
-					demo.xtag.slideTo(slideIndex);
+					demo['data-slide'] = slideIndex;;
 					break;
 
 				case 'slideOrientation':
@@ -113,7 +113,7 @@
 					break;
 
 				case 'getLoopStatus':
-					var msg = demo['loop'] ? 'looping' : 'not looping';
+					var msg = demo['data-loop'] ? 'looping' : 'not looping';
 					document.getElementById('message').children[0].innerHTML = 'Slides are currently ' +  msg;
 					break;
 

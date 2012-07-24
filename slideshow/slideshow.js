@@ -18,6 +18,14 @@
 			var selected = xtag.query(el, 'x-slides > x-slide[selected="true"]')[0] || 0;
 			return [selected ? xtag.query(el, 'x-slides > x-slide').indexOf(selected) : selected, el.firstElementChild.children.length - 1];
 		},
+		validSlide = function(el,index){
+			if (index < 0) return 0;
+			var slides = getState(el)[1];
+			if (index > slides) {
+				return slides;
+			}
+			return index;
+		},
 		slide = function(el, index){
 			var slides = xtag.toArray(el.firstElementChild.children);
 			slides.forEach(function(slide){ slide.removeAttribute('selected'); });
@@ -83,7 +91,7 @@
 				startOnSlide(this, start);
 			}
 			if (autoplay != undefined) {
-				play.call(this, this.getAttribute('loop') != undefined);
+				play.call(this, this.getAttribute('data-loop') != undefined);
 			}
  		},
 		events:{
@@ -98,9 +106,12 @@
 			'data-start' : function(){
 				return this.getAttribute('data-start');
 			},
-			'loop' : function() {
-				return this.getAttribute('loop') != undefined;
+			'data-loop' : function() {
+				return this.getAttribute('data-loop') != undefined;
 			},
+			'data-slide': function(){
+				return this.getAttribute('data-slide');
+			}
 		},
 		setters: {
 			'data-orientation': function(value){
@@ -111,10 +122,14 @@
 				this.setAttribute('data-interval', value);
 			},
 			'data-start': function(value){
-				var slideSet = getState(this);
-				if (value > slideSet[1]+1) value = slideSet[1]+1;
-				if (value < 1) value = 1;
+				value = validSlide(this, value) + 1;
 				this.setAttribute('data-start', value);
+			},
+			'data-slide': function(value){
+				value = validSlide(this, value-1);
+				stop.call(this);
+				slide.call(this, this, value);
+				this.setAttribute('data-slide', value+1);
 			}
 		},
 		methods: {
@@ -123,18 +138,8 @@
 				shift[0]++;
 				slide(this, shift[0] > shift[1] ? 0 : shift[0]);
 			},
-			slideTo: function(slideIndex){
-				stop.call(this);
-				if (slideIndex < 0) {
-					slideIndex = 0;
-				} else {
-					var size = getState(this)[1];
-					slideIndex = slideIndex > size ? size : slideIndex;
-				}
-				slide(this, slideIndex);
-			},
 			play: function(){
-				play.call(this, this.getAttribute('loop') != undefined);	
+				play.call(this, this.getAttribute('data-loop') != undefined);	
 			},
 			stop: function(){
 				stop.call(this);
